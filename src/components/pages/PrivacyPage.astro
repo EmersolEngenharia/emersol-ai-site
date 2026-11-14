@@ -1,0 +1,75 @@
+---
+import Breadcrumbs from "../Breadcrumbs.astro";
+import { postalAddress, publicEmail, site } from "../../config/site";
+import { crumbs } from "../../lib/crumbs";
+import { fill } from "../../i18n";
+import type { Dictionary } from "../../i18n/types";
+import type { Locale } from "../../i18n/locales";
+
+interface Props {
+  locale: Locale;
+  dict: Dictionary;
+}
+
+const { locale, dict } = Astro.props;
+const email = publicEmail();
+const address = postalAddress();
+const tax = [site.taxId.label.trim(), site.taxId.value.trim()].filter(Boolean).join(" ");
+const rows = [
+  { label: dict.privacy.fieldLabels.legalName, value: site.legalName.trim(), empty: dict.privacy.notPublished },
+  { label: dict.privacy.fieldLabels.email, value: email, empty: dict.privacy.notPublished },
+  { label: dict.privacy.fieldLabels.address, value: address, empty: dict.privacy.notPublished },
+  { label: dict.privacy.fieldLabels.taxId, value: tax, empty: dict.privacy.notPublished },
+  { label: dict.privacy.fieldLabels.dpo, value: site.dpoEmail.trim(), empty: dict.privacy.noDpo },
+  {
+    label: dict.privacy.fieldLabels.hosting,
+    value: site.hostingRegion.trim(),
+    empty: dict.privacy.hostingUnknown,
+  },
+];
+const months = String(site.inquiryRetentionMonths);
+const analyticsOn = site.analytics.enabled && site.analytics.scriptSrc.trim() !== "";
+const captchaOn = site.turnstileSiteKey.trim() !== "";
+---
+
+<section class="page-hero">
+  <div class="wrap">
+    <Breadcrumbs locale={locale} label={dict.common.breadcrumb} items={crumbs(dict, "privacy")} />
+    <p class="kicker">{dict.privacy.eyebrow}</p>
+    <h1>{dict.privacy.title}</h1>
+    <p class="lede">{dict.privacy.versionLabel}: {site.privacyVersion}</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap prose">
+    {dict.privacy.intro.map((paragraph) => <p>{paragraph}</p>)}
+    <h2>{dict.privacy.identityTitle}</h2>
+    <p>{dict.privacy.identityIntro}</p>
+    <dl class="identity">
+      {rows.map((row) => (
+        <div>
+          <dt>{row.label}</dt>
+          <dd class={row.value ? undefined : "missing"}>{row.value || row.empty}</dd>
+        </div>
+      ))}
+    </dl>
+
+    {dict.privacy.sections.map((section) => (
+      <section>
+        <h2>{section.title}</h2>
+        {section.paragraphs.map((paragraph) => <p>{fill(paragraph, { months })}</p>)}
+      </section>
+    ))}
+
+    <h2>{dict.privacy.statusTitle}</h2>
+    <div class="status">
+      <p>{site.cookies.bannerEnabled ? dict.privacy.statusCookiesOn : dict.privacy.statusCookiesOff}</p>
+      <p>
+        {analyticsOn ? dict.privacy.statusAnalyticsOn : dict.privacy.statusAnalyticsOff}
+        {analyticsOn && site.analytics.scriptSrc.trim() ? ` ${site.analytics.scriptSrc.trim()}` : ""}
+      </p>
+      <p>{captchaOn ? dict.privacy.statusCaptchaOn : dict.privacy.statusCaptchaOff}</p>
+    </div>
+  </div>
+</section>

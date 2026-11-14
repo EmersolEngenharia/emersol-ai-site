@@ -1,0 +1,84 @@
+---
+import Breadcrumbs from "../Breadcrumbs.astro";
+import CtaBand from "../CtaBand.astro";
+import { site } from "../../config/site";
+import { crumbs } from "../../lib/crumbs";
+import { internalProjectIds } from "../../i18n/routes";
+import type { Dictionary } from "../../i18n/types";
+import type { Locale } from "../../i18n/locales";
+
+interface Props {
+  locale: Locale;
+  dict: Dictionary;
+}
+
+const { locale, dict } = Astro.props;
+const studies = site.caseStudies.filter((item) => item.text[locale]);
+---
+
+<section class="page-hero">
+  <div class="wrap">
+    <Breadcrumbs locale={locale} label={dict.common.breadcrumb} items={crumbs(dict, "projects")} />
+    <p class="kicker">{dict.projects.eyebrow}</p>
+    <h1>{dict.projects.title}</h1>
+    <p class="lede">{dict.projects.lead}</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <h2>{dict.projects.internalTitle}</h2>
+    <p>{dict.projects.internalIntro}</p>
+    <div class="card-grid">
+      {internalProjectIds.map((id) => (
+        <article class="project">
+          <div class="meta">{dict.common.internal}</div>
+          <h3>{dict.projects.items[id].name}</h3>
+          <p>{dict.projects.items[id].text}</p>
+        </article>
+      ))}
+    </div>
+
+    <h2 style="margin-top:2.4rem">{dict.projects.demosTitle}</h2>
+    <p>{dict.projects.demosIntro}</p>
+    <div class="pairs">
+      {dict.examples.items.map((item) => (
+        <article class="pair">
+          <h3>{item.title}</h3>
+          <div class="side">
+            <div class="label">{dict.examples.before}</div>
+            <p>{item.before}</p>
+          </div>
+          <div class="side after">
+            <div class="label">{dict.examples.after} · {dict.common.demo}</div>
+            <p>{item.after}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+    <p class="note">{dict.common.demoNote}</p>
+
+    <h2 style="margin-top:2.4rem">{dict.projects.casesTitle}</h2>
+    <p>{dict.projects.casesIntro}</p>
+    {studies.length === 0 ? (
+      <p class="empty">{dict.projects.casesEmpty}</p>
+    ) : (
+      <div class="card-grid">
+        {studies.map((item) => {
+          const text = item.text[locale];
+          if (!text) return null;
+          return (
+            <article class="project">
+              <div class="meta">{item.client} · {item.country} · {item.year}</div>
+              <h3>{text.title}</h3>
+              <p>{text.summary}</p>
+              <p>{text.approach}</p>
+            </article>
+          );
+        })}
+      </div>
+    )}
+  </div>
+</section>
+
+<CtaBand locale={locale} dict={dict} title={dict.home.closing.title} text={dict.home.closing.text} />

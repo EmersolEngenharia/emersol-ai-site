@@ -1,0 +1,47 @@
+---
+import Breadcrumbs from "../Breadcrumbs.astro";
+import CtaBand from "../CtaBand.astro";
+import { site } from "../../config/site";
+import { crumbs } from "../../lib/crumbs";
+import { pricingModelIds } from "../../i18n/routes";
+import type { Dictionary } from "../../i18n/types";
+import type { Locale } from "../../i18n/locales";
+
+interface Props {
+  locale: Locale;
+  dict: Dictionary;
+}
+
+const { locale, dict } = Astro.props;
+---
+
+<section class="page-hero">
+  <div class="wrap">
+    <Breadcrumbs locale={locale} label={dict.common.breadcrumb} items={crumbs(dict, "pricing")} />
+    <p class="kicker">{dict.pricing.eyebrow}</p>
+    <h1>{dict.pricing.title}</h1>
+    <p class="lede">{dict.pricing.lead}</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="card-grid">
+      {pricingModelIds.map((id) => {
+        const model = dict.pricing.models[id];
+        const amount = site.pricing.amounts[id].trim();
+        return (
+          <article class="model">
+            <h2>{model.title}</h2>
+            <p>{model.text}</p>
+            <p>{model.fit}</p>
+            <p><strong>{amount || dict.pricing.pending}</strong></p>
+          </article>
+        );
+      })}
+    </div>
+    <p class="note">{dict.pricing.note}</p>
+  </div>
+</section>
+
+<CtaBand locale={locale} dict={dict} title={dict.cta.talk} text={dict.home.freeNote} />

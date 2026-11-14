@@ -1,0 +1,81 @@
+---
+import Breadcrumbs from "../Breadcrumbs.astro";
+import CtaBand from "../CtaBand.astro";
+import { crumbs } from "../../lib/crumbs";
+import { localePath } from "../../i18n/path";
+import { relatedServices, serviceGroup, type ServiceId } from "../../i18n/routes";
+import type { Dictionary } from "../../i18n/types";
+import type { Locale } from "../../i18n/locales";
+
+interface Props {
+  locale: Locale;
+  dict: Dictionary;
+  id: ServiceId;
+}
+
+const { locale, dict, id } = Astro.props;
+const copy = dict.services[id];
+const trail = crumbs(dict, id);
+---
+
+<section class="page-hero">
+  <div class="wrap">
+    <Breadcrumbs locale={locale} label={dict.common.breadcrumb} items={trail} />
+    <p class="kicker">{dict.groups[serviceGroup[id]].title}</p>
+    <h1>{copy.name}</h1>
+    <p class="lede">{copy.lead}</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="two">
+      <div>
+        <h2>{dict.common.forWhom}</h2>
+        <p>{copy.forWhom}</p>
+      </div>
+      <div>
+        <h2>{dict.common.situations}</h2>
+        {copy.situations.map((item) => (
+          <article class="card" style="margin-bottom:0.7rem">
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+
+    <h2>{dict.common.includes}</h2>
+    <div class="card-grid">
+      {copy.includes.map((item) => (
+        <article class="card">
+          <h3>{item.title}</h3>
+          <p>{item.text}</p>
+        </article>
+      ))}
+    </div>
+
+    {copy.highlight && (
+      <aside class="highlight">
+        <p class="kicker">{copy.highlight.kicker}</p>
+        <h2>{copy.highlight.title}</h2>
+        <p>{copy.highlight.text}</p>
+        <ul>
+          {copy.highlight.points.map((point) => <li>{point}</li>)}
+        </ul>
+      </aside>
+    )}
+
+    <h2>{dict.common.boundary}</h2>
+    <p class="boundary">{copy.boundary}</p>
+
+    <h2>{dict.common.related}</h2>
+    <div class="service-links">
+      {relatedServices[id].map((related) => (
+        <a href={localePath(locale, related)}>{dict.services[related].name}</a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<CtaBand locale={locale} dict={dict} title={dict.cta.talk} text={dict.home.freeNote} />

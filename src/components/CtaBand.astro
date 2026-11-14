@@ -1,0 +1,25 @@
+---
+import { localePath } from "../i18n/path";
+import type { Dictionary } from "../i18n/types";
+import type { Locale } from "../i18n/locales";
+
+interface Props {
+  locale: Locale;
+  dict: Dictionary;
+  title: string;
+  text: string;
+}
+
+const { locale, dict, title, text } = Astro.props;
+---
+
+<section class="cta-band">
+  <div class="wrap">
+    <h2>{title}</h2>
+    <p>{text}</p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href={localePath(locale, "contact")}>{dict.cta.talk}</a>
+      <a class="btn btn-ghost" href={localePath(locale, "projects")}>{dict.cta.practice}</a>
+    </div>
+  </div>
+</section>

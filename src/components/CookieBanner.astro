@@ -1,0 +1,59 @@
+---
+import { localePath } from "../i18n/path";
+import { site } from "../config/site";
+import type { Dictionary } from "../i18n/types";
+import type { Locale } from "../i18n/locales";
+
+interface Props {
+  locale: Locale;
+  dict: Dictionary;
+  analyticsOn: boolean;
+}
+
+const { locale, dict, analyticsOn } = Astro.props;
+---
+
+<div class="cookie" data-cookie-banner hidden>
+  <div class="wrap">
+    <p>
+      {dict.cookies.title}. {dict.cookies.text}{" "}
+      <a href={localePath(locale, "privacy")}>{dict.footer.privacy}</a>
+    </p>
+    <div class="btn-row">
+      <button class="btn btn-primary" type="button" data-cookie-accept>{dict.cookies.accept}</button>
+      <button class="btn btn-ghost" type="button" data-cookie-reject>{dict.cookies.reject}</button>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ src: site.analytics.scriptSrc, domain: site.analytics.domain, analyticsOn }}>
+  const root = document.querySelector("[data-cookie-banner]");
+  const key = "emersol-cookies";
+  const stored = localStorage.getItem(key);
+
+  function loadAnalytics() {
+    if (!analyticsOn || !src || document.querySelector("script[data-emersol-analytics]")) return;
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.dataset.emersolAnalytics = "true";
+    if (domain) script.dataset.domain = domain;
+    document.head.append(script);
+  }
+
+  if (stored === "accept") {
+    loadAnalytics();
+  } else if (stored !== "reject" && root instanceof HTMLElement) {
+    root.hidden = false;
+  }
+
+  root?.querySelector("[data-cookie-accept]")?.addEventListener("click", () => {
+    localStorage.setItem(key, "accept");
+    if (root instanceof HTMLElement) root.hidden = true;
+    loadAnalytics();
+  });
+  root?.querySelector("[data-cookie-reject]")?.addEventListener("click", () => {
+    localStorage.setItem(key, "reject");
+    if (root instanceof HTMLElement) root.hidden = true;
+  });
+</script>

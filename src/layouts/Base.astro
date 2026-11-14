@@ -1,0 +1,76 @@
+---
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import CookieBanner from "../components/CookieBanner.astro";
+import { site } from "../config/site";
+import { absoluteUrl, alternates, localePath } from "../i18n/path";
+import { htmlLang, ogLocale, locales } from "../i18n/locales";
+import { crumbs } from "../lib/crumbs";
+import { pageGraph } from "../lib/schema";
+import type { Dictionary } from "../i18n/types";
+import type { Locale } from "../i18n/locales";
+import type { RouteKey } from "../i18n/routes";
+
+interface Props {
+  locale: Locale;
+  routeKey: RouteKey;
+  dict: Dictionary;
+}
+
+const { locale, routeKey, dict } = Astro.props;
+const seo = dict.seo[routeKey];
+const path = localePath(locale, routeKey);
+const canonical = absoluteUrl(path);
+const links = alternates(routeKey);
+const graph = JSON.stringify(pageGraph(locale, dict, routeKey, crumbs(dict, routeKey))).replace(/</g, "\\u003c");
+const analyticsOn = site.analytics.enabled && site.analytics.scriptSrc.trim() !== "";
+const bannerOn = site.cookies.bannerEnabled;
+const ogImage = absoluteUrl(`/og/${locale}.png`);
+---
+
+<!doctype html>
+<html lang={htmlLang[locale]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{seo.title}</title>
+    <meta name="description" content={seo.description} />
+    <link rel="canonical" href={canonical} />
+    {links.map((link) => (
+      <link rel="alternate" hreflang={link.hreflang} href={link.href} />
+    ))}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={seo.title} />
+    <meta property="og:description" content={seo.description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={ogLocale[locale]} />
+    {locales.filter((code) => code !== locale).map((code) => (
+      <meta property="og:locale:alternate" content={ogLocale[code]} />
+    ))}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={site.name} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={seo.title} />
+    <meta name="twitter:description" content={seo.description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="theme-color" content="#1c1e1a" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script type="application/ld+json" set:html={graph} />
+    {analyticsOn && !bannerOn && (
+      <script is:inline async src={site.analytics.scriptSrc} data-domain={site.analytics.domain || undefined}></script>
+    )}
+  </head>
+  <body>
+    <a class="skip" href="#conteudo">{dict.common.skip}</a>
+    <Header locale={locale} routeKey={routeKey} dict={dict} />
+    <main id="conteudo">
+      <slot />
+    </main>
+    <Footer locale={locale} dict={dict} />
+    {bannerOn && <CookieBanner locale={locale} dict={dict} analyticsOn={analyticsOn} />}
+  </body>
+</html>

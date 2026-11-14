@@ -1,0 +1,62 @@
+---
+import { site, publicEmail, whatsappHref, telHref } from "../config/site";
+import { fill } from "../i18n";
+import { localePath } from "../i18n/path";
+import { groups } from "../i18n/routes";
+import type { Dictionary } from "../i18n/types";
+import type { Locale } from "../i18n/locales";
+
+interface Props {
+  locale: Locale;
+  dict: Dictionary;
+}
+
+const { locale, dict } = Astro.props;
+const email = publicEmail();
+const wa = whatsappHref();
+const tel = telHref();
+const phoneLabel = site.phone.trim() || site.whatsapp.trim();
+const year = String(new Date().getFullYear());
+---
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div>
+      <a class="logo" href={localePath(locale, "home")}><span>Emersol<span class="dot">.ai</span></span></a>
+      <p>{dict.footer.tagline}</p>
+      <p>{dict.footer.remote}</p>
+    </div>
+    <div>
+      <h2>{dict.footer.solutions}</h2>
+      <ul>
+        {groups.flatMap((group) => group.services).map((id) => (
+          <li><a href={localePath(locale, id)}>{dict.services[id].name}</a></li>
+        ))}
+      </ul>
+    </div>
+    <div>
+      <h2>{dict.footer.company}</h2>
+      <ul>
+        <li><a href={localePath(locale, "segment")}>{dict.nav.segment}</a></li>
+        <li><a href={localePath(locale, "projects")}>{dict.nav.projects}</a></li>
+        <li><a href={localePath(locale, "about")}>{dict.nav.about}</a></li>
+        <li><a href={localePath(locale, "contact")}>{dict.nav.contact}</a></li>
+        <li><a href={localePath(locale, "privacy")}>{dict.footer.privacy}</a></li>
+        {site.pricing.enabled && <li><a href={localePath(locale, "pricing")}>{dict.pricing.title}</a></li>}
+      </ul>
+      <h2>{dict.footer.contact}</h2>
+      <ul>
+        {email && <li><a href={`mailto:${email}`}>{email}</a></li>}
+        {tel && phoneLabel && <li><a href={tel}>{phoneLabel}</a></li>}
+        {wa && <li><a href={wa} rel="noopener noreferrer">WhatsApp</a></li>}
+        {site.linkedin.trim() && (
+          <li><a href={site.linkedin.trim()} rel="noopener noreferrer">LinkedIn</a></li>
+        )}
+        {!email && !tel && !wa && !site.linkedin.trim() && (
+          <li><a href={localePath(locale, "contact")}>{dict.footer.formChannel}</a></li>
+        )}
+      </ul>
+    </div>
+  </div>
+  <div class="wrap legal">{fill(dict.footer.rights, { year })}</div>
+</footer>

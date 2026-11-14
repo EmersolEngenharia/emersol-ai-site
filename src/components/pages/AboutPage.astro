@@ -1,0 +1,50 @@
+---
+import Breadcrumbs from "../Breadcrumbs.astro";
+import CtaBand from "../CtaBand.astro";
+import { crumbs } from "../../lib/crumbs";
+import type { Dictionary } from "../../i18n/types";
+import type { Locale } from "../../i18n/locales";
+
+interface Props {
+  locale: Locale;
+  dict: Dictionary;
+}
+
+const { locale, dict } = Astro.props;
+---
+
+<section class="page-hero">
+  <div class="wrap">
+    <Breadcrumbs locale={locale} label={dict.common.breadcrumb} items={crumbs(dict, "about")} />
+    <p class="kicker">{dict.about.eyebrow}</p>
+    <h1>{dict.about.title}</h1>
+    <p class="lede">{dict.about.lead}</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap founder-grid">
+    <div class="prose">
+      {dict.about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+      <h2>{dict.about.practiceTitle}</h2>
+      {dict.about.practice.map((item) => (
+        <div>
+          <h3>{item.title}</h3>
+          <p>{item.text}</p>
+        </div>
+      ))}
+      <h2>{dict.about.marketsTitle}</h2>
+      <p>{dict.about.markets}</p>
+    </div>
+    <dl class="facts identity">
+      {dict.about.facts.map((fact) => (
+        <div>
+          <dt>{fact.label}</dt>
+          <dd>{fact.value}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<CtaBand locale={locale} dict={dict} title={dict.home.closing.title} text={dict.home.closing.text} />
