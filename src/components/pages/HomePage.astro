@@ -1,0 +1,174 @@
+---
+import OpsBoard from "../OpsBoard.astro";
+import CtaBand from "../CtaBand.astro";
+import { groups } from "../../i18n/routes";
+import { localePath } from "../../i18n/path";
+import type { Dictionary } from "../../i18n/types";
+import type { Locale } from "../../i18n/locales";
+
+interface Props {
+  locale: Locale;
+  dict: Dictionary;
+}
+
+const { locale, dict } = Astro.props;
+---
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="kicker">{dict.home.eyebrow}</p>
+      <h1>{dict.home.title}</h1>
+      <p class="lede">{dict.home.lead}</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href={localePath(locale, "contact")}>{dict.cta.talk}</a>
+        <a class="btn btn-ghost" href={localePath(locale, "projects")}>{dict.cta.practice}</a>
+      </div>
+      <p class="free-note">{dict.home.freeNote}</p>
+    </div>
+    <OpsBoard dict={dict} />
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">{dict.home.problems.eyebrow}</p>
+      <h2>{dict.home.problems.title}</h2>
+      <p>{dict.home.problems.intro}</p>
+    </div>
+    <ol class="problem-list">
+      {dict.home.problems.items.map((item, index) => (
+        <li>
+          <span class="num">{String(index + 1).padStart(2, "0")}</span>
+          <div>
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">{dict.home.solutions.eyebrow}</p>
+      <h2>{dict.home.solutions.title}</h2>
+      <p>{dict.home.solutions.intro}</p>
+    </div>
+    <div class="group-list">
+      {groups.map((group) => (
+        <article class="group">
+          <h3>{dict.groups[group.id].title}</h3>
+          <p>{dict.groups[group.id].text}</p>
+          <div class="service-links">
+            {group.services.map((id) => (
+              <a href={localePath(locale, id)}>{dict.services[id].name}</a>
+            ))}
+          </div>
+        </article>
+      ))}
+    </div>
+    <p style="margin-top:1.2rem"><a href={localePath(locale, "solutions")}>{dict.nav.solutions}</a></p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap split">
+    <div>
+      <p class="kicker">{dict.home.segment.eyebrow}</p>
+      <h2>{dict.home.segment.title}</h2>
+      <p>{dict.home.segment.text}</p>
+      <ul class="points">
+        {dict.home.segment.points.map((point) => <li>{point}</li>)}
+      </ul>
+      <a class="btn btn-primary" href={localePath(locale, "segment")}>{dict.home.segment.link}</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">{dict.examples.eyebrow}</p>
+      <h2>{dict.examples.title}</h2>
+      <p>{dict.examples.intro}</p>
+    </div>
+    <div class="pairs">
+      {dict.examples.items.map((item) => (
+        <article class="pair">
+          <h3>{item.title}</h3>
+          <div class="side">
+            <div class="label">{dict.examples.before}</div>
+            <p>{item.before}</p>
+          </div>
+          <div class="side after">
+            <div class="label">{dict.examples.after} · {dict.common.demo}</div>
+            <p>{item.after}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+    <p class="note">{dict.common.demoNote}</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">{dict.process.eyebrow}</p>
+      <h2>{dict.process.title}</h2>
+      <p>{dict.process.intro}</p>
+    </div>
+    <ol class="steps">
+      {dict.process.steps.map((step, index) => (
+        <li>
+          <div class="num">{String(index + 1).padStart(2, "0")}</div>
+          <h3>{step.title}</h3>
+          <p>{step.text}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap founder-grid">
+    <div>
+      <p class="kicker">{dict.home.founder.eyebrow}</p>
+      <h2>{dict.home.founder.title}</h2>
+      {dict.home.founder.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+      <p><a href={localePath(locale, "about")}>{dict.home.founder.link}</a></p>
+    </div>
+    <div>
+      <div class="monogram" aria-hidden="true">E<span>M</span></div>
+      <div class="note" style="margin-top:1rem">
+        <p class="kicker">{dict.home.projects.eyebrow}</p>
+        <h3>{dict.home.projects.title}</h3>
+        <p>{dict.home.projects.text}</p>
+        <p><a href={localePath(locale, "projects")}>{dict.home.projects.link}</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">{dict.faq.eyebrow}</p>
+      <h2>{dict.faq.title}</h2>
+    </div>
+    <div class="faq">
+      {dict.faq.items.map((item) => (
+        <details>
+          <summary>{item.q}</summary>
+          <p>{item.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<CtaBand locale={locale} dict={dict} title={dict.home.closing.title} text={dict.home.closing.text} />

@@ -1,0 +1,73 @@
+---
+import Breadcrumbs from "../Breadcrumbs.astro";
+import CtaBand from "../CtaBand.astro";
+import { crumbs } from "../../lib/crumbs";
+import { groups } from "../../i18n/routes";
+import { localePath } from "../../i18n/path";
+import type { Dictionary } from "../../i18n/types";
+import type { Locale } from "../../i18n/locales";
+
+interface Props {
+  locale: Locale;
+  dict: Dictionary;
+}
+
+const { locale, dict } = Astro.props;
+const trail = crumbs(dict, "solutions");
+---
+
+<section class="page-hero">
+  <div class="wrap">
+    <Breadcrumbs locale={locale} label={dict.common.breadcrumb} items={trail} />
+    <p class="kicker">{dict.solutionsPage.eyebrow}</p>
+    <h1>{dict.solutionsPage.title}</h1>
+    <p class="lede">{dict.solutionsPage.lead}</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    {groups.map((group) => (
+      <section class="group">
+        <h2>{dict.groups[group.id].title}</h2>
+        <p>{dict.groups[group.id].text}</p>
+        <div class="card-grid">
+          {group.services.map((id) => (
+            <article class="card">
+              <h3><a href={localePath(locale, id)}>{dict.services[id].name}</a></h3>
+              <p>{dict.services[id].summary}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <aside class="highlight">
+      <p class="kicker">{dict.solutionsPage.n8n.kicker}</p>
+      <h2>{dict.solutionsPage.n8n.title}</h2>
+      <p>{dict.solutionsPage.n8n.text}</p>
+      <p><a href={localePath(locale, "commercial")}>{dict.services.commercial.name}</a></p>
+    </aside>
+
+    <aside class="note">
+      <p class="kicker">{dict.solutionsPage.solarNote.kicker}</p>
+      <h2>{dict.solutionsPage.solarNote.title}</h2>
+      <p>{dict.solutionsPage.solarNote.text}</p>
+      <p><a href={localePath(locale, "solar")}>{dict.solutionsPage.solarNote.link}</a></p>
+    </aside>
+
+    <h2>{dict.solutionsPage.formatsTitle}</h2>
+    <p>{dict.solutionsPage.formatsIntro}</p>
+    <div class="card-grid">
+      {Object.values(dict.pricing.models).map((model) => (
+        <article class="model">
+          <h3>{model.title}</h3>
+          <p>{model.text}</p>
+          <p>{model.fit}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<CtaBand locale={locale} dict={dict} title={dict.home.closing.title} text={dict.home.closing.text} />

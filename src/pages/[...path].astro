@@ -1,0 +1,51 @@
+---
+import Base from "../layouts/Base.astro";
+import HomePage from "../components/pages/HomePage.astro";
+import SolutionsPage from "../components/pages/SolutionsPage.astro";
+import ServicePage from "../components/pages/ServicePage.astro";
+import SegmentPage from "../components/pages/SegmentPage.astro";
+import ProjectsPage from "../components/pages/ProjectsPage.astro";
+import AboutPage from "../components/pages/AboutPage.astro";
+import ContactPage from "../components/pages/ContactPage.astro";
+import PrivacyPage from "../components/pages/PrivacyPage.astro";
+import PricingPage from "../components/pages/PricingPage.astro";
+import { site } from "../config/site";
+import { dictionaries } from "../i18n";
+import { locales, type Locale } from "../i18n/locales";
+import { localePath } from "../i18n/path";
+import { isServiceId, routeKeys, type RouteKey, type ServiceId } from "../i18n/routes";
+
+export function getStaticPaths() {
+  const keys = routeKeys.filter((key) => site.pricing.enabled || key !== "pricing");
+  return locales.flatMap((locale) =>
+    keys.map((routeKey) => {
+      const trimmed = localePath(locale, routeKey).replace(/^\/|\/$/g, "");
+      return {
+        params: { path: trimmed === "" ? undefined : trimmed },
+        props: { locale, routeKey },
+      };
+    }),
+  );
+}
+
+interface Props {
+  locale: Locale;
+  routeKey: RouteKey;
+}
+
+const { locale, routeKey } = Astro.props;
+const dict = dictionaries[locale];
+const serviceId: ServiceId | null = isServiceId(routeKey) ? routeKey : null;
+---
+
+<Base locale={locale} routeKey={routeKey} dict={dict}>
+  {routeKey === "home" && <HomePage locale={locale} dict={dict} />}
+  {routeKey === "solutions" && <SolutionsPage locale={locale} dict={dict} />}
+  {serviceId && <ServicePage locale={locale} dict={dict} id={serviceId} />}
+  {routeKey === "segment" && <SegmentPage locale={locale} dict={dict} />}
+  {routeKey === "projects" && <ProjectsPage locale={locale} dict={dict} />}
+  {routeKey === "about" && <AboutPage locale={locale} dict={dict} />}
+  {routeKey === "contact" && <ContactPage locale={locale} dict={dict} />}
+  {routeKey === "privacy" && <PrivacyPage locale={locale} dict={dict} />}
+  {routeKey === "pricing" && <PricingPage locale={locale} dict={dict} />}
+</Base>

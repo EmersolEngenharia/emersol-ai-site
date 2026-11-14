@@ -1,0 +1,71 @@
+---
+import Breadcrumbs from "../Breadcrumbs.astro";
+import CtaBand from "../CtaBand.astro";
+import { crumbs } from "../../lib/crumbs";
+import { localePath } from "../../i18n/path";
+import type { Dictionary } from "../../i18n/types";
+import type { Locale } from "../../i18n/locales";
+
+interface Props {
+  locale: Locale;
+  dict: Dictionary;
+}
+
+const { locale, dict } = Astro.props;
+---
+
+<section class="page-hero">
+  <div class="wrap">
+    <Breadcrumbs locale={locale} label={dict.common.breadcrumb} items={crumbs(dict, "segment")} />
+    <p class="kicker">{dict.segment.eyebrow}</p>
+    <h1>{dict.segment.title}</h1>
+    <p class="lede">{dict.segment.lead}</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <h2>{dict.segment.audienceTitle}</h2>
+    <div class="audience-grid">
+      {dict.segment.audiences.map((item) => (
+        <article class="audience">
+          <h3>{item.title}</h3>
+          <p>{item.text}</p>
+        </article>
+      ))}
+    </div>
+
+    <h2 style="margin-top:2.2rem">{dict.segment.dayTitle}</h2>
+    <ol class="timeline">
+      {dict.segment.day.map((item, index) => (
+        <li>
+          <span class="n">{index + 1}</span>
+          <div>
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <h2>{dict.segment.breaksTitle}</h2>
+    <div class="card-grid">
+      {dict.segment.breaks.map((item) => (
+        <article class="card">
+          <h3>{item.title}</h3>
+          <p>{item.text}</p>
+        </article>
+      ))}
+    </div>
+
+    <aside class="note">
+      <span class="stamp">{dict.common.demo}</span>
+      <h2>{dict.segment.pictureTitle}</h2>
+      <p>{dict.segment.picture}</p>
+      <p class="free-note">{dict.common.demoNote}</p>
+      <p><a href={localePath(locale, "projects")}>{dict.cta.practice}</a></p>
+    </aside>
+  </div>
+</section>
+
+<CtaBand locale={locale} dict={dict} title={dict.home.closing.title} text={dict.home.closing.text} />

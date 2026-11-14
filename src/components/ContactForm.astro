@@ -1,0 +1,177 @@
+---
+import { publicEmail } from "../config/site";
+import { site } from "../config/site";
+import { localePath } from "../i18n/path";
+import type { Dictionary } from "../i18n/types";
+import type { Locale } from "../i18n/locales";
+
+interface Props {
+  locale: Locale;
+  dict: Dictionary;
+}
+
+const { locale, dict } = Astro.props;
+const email = publicEmail();
+const messages = {
+  ...dict.form.errors,
+  successTitle: dict.form.successTitle,
+  successBody: dict.form.successBody,
+  fallbackIntro: dict.form.fallbackIntro,
+  noFallback: dict.form.noFallback,
+  sending: dict.form.sending,
+  submit: dict.form.submit,
+};
+---
+
+<form class="form" method="post" action="/api/contact.php" data-contact-form data-email={email}>
+  <div class="form-status" data-form-status hidden></div>
+  <div class="form-grid">
+    <div class="field" data-field="name">
+      <label for="f-name">{dict.form.name} <span class="hint">({dict.common.required})</span></label>
+      <input id="f-name" name="name" type="text" autocomplete="name" required maxlength="120" />
+    </div>
+    <div class="field" data-field="company">
+      <label for="f-company">{dict.form.company} <span class="hint">({dict.common.required})</span></label>
+      <input id="f-company" name="company" type="text" autocomplete="organization" required maxlength="160" />
+    </div>
+    <div class="field" data-field="email">
+      <label for="f-email">{dict.form.email} <span class="hint">({dict.common.required})</span></label>
+      <input id="f-email" name="email" type="email" autocomplete="email" required maxlength="160" />
+    </div>
+    <div class="field" data-field="country">
+      <label for="f-country">{dict.form.country} <span class="hint">({dict.common.required})</span></label>
+      <select id="f-country" name="country" autocomplete="country" required>
+        <option value="">{dict.form.countryPlaceholder}</option>
+        {dict.form.countries.map((option) => <option value={option.value}>{option.label}</option>)}
+      </select>
+    </div>
+    <div class="field" data-field="website">
+      <label for="f-website">{dict.form.website} <span class="hint">({dict.common.optional})</span></label>
+      <input id="f-website" name="website" type="text" inputmode="url" autocomplete="url" maxlength="200" />
+    </div>
+    <div class="field" data-field="phone">
+      <label for="f-phone">{dict.form.phone} <span class="hint">({dict.common.optional})</span></label>
+      <input id="f-phone" name="phone" type="tel" autocomplete="tel" maxlength="40" />
+    </div>
+    <div class="field wide" data-field="problem">
+      <label for="f-problem">{dict.form.problem} <span class="hint">({dict.common.required})</span></label>
+      <textarea id="f-problem" name="problem" required maxlength="4000"></textarea>
+    </div>
+    <div class="field" data-field="budget">
+      <label for="f-budget">{dict.form.budget} <span class="hint">({dict.common.required})</span></label>
+      <select id="f-budget" name="budget" required>
+        <option value="">{dict.form.budgetPlaceholder}</option>
+        {dict.form.budgets.map((option) => <option value={option.value}>{option.label}</option>)}
+      </select>
+    </div>
+    <div class="field" data-field="timeline">
+      <label for="f-timeline">{dict.form.timeline} <span class="hint">({dict.common.required})</span></label>
+      <select id="f-timeline" name="timeline" required>
+        <option value="">{dict.form.timelinePlaceholder}</option>
+        {dict.form.timelines.map((option) => <option value={option.value}>{option.label}</option>)}
+      </select>
+    </div>
+    <div class="field wide check" data-field="consent">
+      <input id="f-consent" name="consent" type="checkbox" value="yes" required />
+      <label for="f-consent">
+        {dict.form.consentBefore}<a href={localePath(locale, "privacy")}>{dict.form.consentLink}</a>{dict.form.consentAfter}
+      </label>
+    </div>
+  </div>
+  <div class="hp" aria-hidden="true">
+    <label for="f-fax">{dict.form.honeypot}</label>
+    <input id="f-fax" name="company_fax" type="text" tabindex="-1" autocomplete="off" value="" />
+  </div>
+  <input type="hidden" name="locale" value={locale} />
+  <input type="hidden" name="started_at" value="" />
+  {site.turnstileSiteKey.trim() && (
+    <div class="cf-turnstile" data-sitekey={site.turnstileSiteKey.trim()}></div>
+  )}
+  <button class="btn btn-primary" type="submit" data-submit>{dict.form.submit}</button>
+</form>
+<script type="application/json" id="form-messages" set:html={JSON.stringify(messages).replace(/</g, "\\u003c")} />
+{site.turnstileSiteKey.trim() && (
+  <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+)}
+
+<script>
+  const form = document.querySelector("[data-contact-form]");
+  const raw = document.querySelector("#form-messages");
+  if (form instanceof HTMLFormElement && raw) {
+    const messages = JSON.parse(raw.textContent || "{}");
+    const started = form.querySelector("[name=started_at]");
+    if (started instanceof HTMLInputElement) started.value = String(Date.now());
+    const status = form.querySelector("[data-form-status]");
+    const button = form.querySelector("[data-submit]");
+
+    const show = (kind, title, body, fields = []) => {
+      if (!(status instanceof HTMLElement)) return;
+      status.hidden = false;
+      status.className = `form-status ${kind}`;
+      status.innerHTML = "";
+      const heading = document.createElement("strong");
+      heading.textContent = title;
+      status.append(heading);
+      if (body) {
+        const paragraph = document.createElement("p");
+        paragraph.textContent = body;
+        status.append(paragraph);
+      }
+      form.querySelectorAll(".field").forEach((field) => field.classList.remove("is-invalid"));
+      if (fields.length) {
+        const list = document.createElement("ul");
+        fields.forEach((name) => {
+          const field = form.querySelector(`[data-field="${name}"]`);
+          field?.classList.add("is-invalid");
+          const item = document.createElement("li");
+          const link = document.createElement("a");
+          link.href = `#f-${name === "consent" ? "consent" : name}`;
+          link.textContent = name;
+          item.append(link);
+          list.append(item);
+        });
+        status.append(list);
+      }
+      status.focus?.();
+    };
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (button instanceof HTMLButtonElement) {
+        button.disabled = true;
+        button.textContent = messages.sending;
+      }
+      const data = Object.fromEntries(new FormData(form).entries());
+      const consent = form.querySelector("[name=consent]");
+      data.consent = consent instanceof HTMLInputElement && consent.checked ? "yes" : "";
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          headers: { Accept: "application/json", "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const payload = await response.json().catch(() => null);
+        if (payload && payload.ok === true) {
+          show("ok", messages.successTitle, messages.successBody);
+          form.querySelector(".form-grid")?.setAttribute("hidden", "");
+          if (button instanceof HTMLButtonElement) button.hidden = true;
+          return;
+        }
+        const code = payload && payload.error ? payload.error : "network";
+        const text = messages[code] || messages.network;
+        const email = form.dataset.email || "";
+        const extra = email ? `${messages.fallbackIntro} ${email}` : messages.noFallback;
+        show("err", text, extra, Array.isArray(payload?.fields) ? payload.fields : []);
+      } catch {
+        const email = form.dataset.email || "";
+        const extra = email ? `${messages.fallbackIntro} ${email}` : messages.noFallback;
+        show("err", messages.network, extra);
+      } finally {
+        if (button instanceof HTMLButtonElement && !button.hidden) {
+          button.disabled = false;
+          button.textContent = messages.submit;
+        }
+      }
+    });
+  }
+</script>

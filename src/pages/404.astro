@@ -1,0 +1,39 @@
+---
+import "../styles/global.css";
+import { dictionaries } from "../i18n";
+import { locales } from "../i18n/locales";
+import { localePath } from "../i18n/path";
+import { site } from "../config/site";
+
+const pt = dictionaries.pt;
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pt.notFound.title} | {site.name}</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <main class="not-found" id="conteudo">
+      <div class="wrap">
+        <a class="logo" href="/"><span>Emersol<span class="dot">.ai</span></span></a>
+        <div class="lang-blocks">
+          {locales.map((locale) => {
+            const dict = dictionaries[locale];
+            return (
+              <article lang={locale === "pt" ? "pt-BR" : locale}>
+                <h1>{dict.notFound.title}</h1>
+                <p>{dict.notFound.text}</p>
+                <p><a href={localePath(locale, "home")}>{dict.notFound.home}</a></p>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

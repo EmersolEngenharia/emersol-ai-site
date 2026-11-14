@@ -1,0 +1,49 @@
+---
+import Breadcrumbs from "../Breadcrumbs.astro";
+import ContactForm from "../ContactForm.astro";
+import { publicEmail } from "../../config/site";
+import { crumbs } from "../../lib/crumbs";
+import type { Dictionary } from "../../i18n/types";
+import type { Locale } from "../../i18n/locales";
+
+interface Props {
+  locale: Locale;
+  dict: Dictionary;
+}
+
+const { locale, dict } = Astro.props;
+const email = publicEmail();
+---
+
+<section class="page-hero">
+  <div class="wrap">
+    <Breadcrumbs locale={locale} label={dict.common.breadcrumb} items={crumbs(dict, "contact")} />
+    <p class="kicker">{dict.contact.eyebrow}</p>
+    <h1>{dict.contact.title}</h1>
+    <p class="lede">{dict.contact.lead}</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap contact-grid">
+    <div>
+      <article class="card">
+        <h2>{dict.contact.freeTitle}</h2>
+        <p>{dict.contact.freeText}</p>
+      </article>
+      <article class="card" style="margin-top:0.8rem">
+        <h2>{dict.contact.diagnosisTitle}</h2>
+        <p>{dict.contact.diagnosisText}</p>
+      </article>
+      <div class="note">
+        <h2>{dict.contact.asideTitle}</h2>
+        {email ? (
+          <p>{dict.contact.asideText} <a href={`mailto:${email}`}>{email}</a></p>
+        ) : (
+          <p>{dict.contact.noEmail}</p>
+        )}
+      </div>
+    </div>
+    <ContactForm locale={locale} dict={dict} />
+  </div>
+</section>

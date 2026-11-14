@@ -1,0 +1,7 @@
+# Apache (quando o Plesk o usa na frente do nginx).
+# Impede o download de arquivos ocultos se alguém os copiar para o docroot.
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
+ErrorDocument 404 /404.html

@@ -1,0 +1,82 @@
+---
+import { localePath } from "../i18n/path";
+import { locales } from "../i18n/locales";
+import { dictionaries } from "../i18n";
+import { isServiceId, type RouteKey } from "../i18n/routes";
+import type { Dictionary } from "../i18n/types";
+import type { Locale } from "../i18n/locales";
+
+interface Props {
+  locale: Locale;
+  routeKey: RouteKey;
+  dict: Dictionary;
+}
+
+const { locale, routeKey, dict } = Astro.props;
+const items: { key: RouteKey; label: string; current: boolean }[] = [
+  { key: "solutions", label: dict.nav.solutions, current: routeKey === "solutions" || isServiceId(routeKey) },
+  { key: "segment", label: dict.nav.segment, current: routeKey === "segment" },
+  { key: "projects", label: dict.nav.projects, current: routeKey === "projects" },
+  { key: "about", label: dict.nav.about, current: routeKey === "about" },
+  { key: "contact", label: dict.nav.contact, current: routeKey === "contact" },
+];
+---
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="logo" href={localePath(locale, "home")}>
+      <span class="mark" aria-hidden="true"></span>
+      <span>Emersol<span class="dot">.ai</span></span>
+    </a>
+    <button
+      class="menu-btn"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-menu"
+      data-menu-button
+      data-open-label={dict.common.menu}
+      data-close-label={dict.common.close}
+    >
+      {dict.common.menu}
+    </button>
+    <nav id="site-menu" class="site-nav" data-menu aria-label={dict.common.menu}>
+      {items.map((item) => (
+        <a href={localePath(locale, item.key)} aria-current={item.current ? "page" : undefined}>{item.label}</a>
+      ))}
+      <div class="langs" aria-label={dict.common.language}>
+        {locales.map((code) => (
+          <a
+            href={localePath(code, routeKey)}
+            hrefLang={code === "pt" ? "pt-BR" : code}
+            lang={code === "pt" ? "pt-BR" : code}
+            aria-current={code === locale ? "true" : undefined}
+          >
+            {dictionaries[code].languageName}
+          </a>
+        ))}
+      </div>
+      <a class="btn btn-primary nav-cta" href={localePath(locale, "contact")}>{dict.cta.talk}</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const button = document.querySelector("[data-menu-button]");
+  const nav = document.querySelector("[data-menu]");
+  if (button instanceof HTMLButtonElement && nav instanceof HTMLElement) {
+    const openLabel = button.dataset.openLabel || "Menu";
+    const closeLabel = button.dataset.closeLabel || "Close";
+    const setOpen = (open: boolean) => {
+      nav.classList.toggle("is-open", open);
+      button.setAttribute("aria-expanded", open ? "true" : "false");
+      button.textContent = open ? closeLabel : openLabel;
+    };
+    button.addEventListener("click", () => setOpen(!nav.classList.contains("is-open")));
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && nav.classList.contains("is-open")) {
+        setOpen(false);
+        button.focus();
+      }
+    });
+  }
+</script>
