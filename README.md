@@ -63,10 +63,12 @@ cp .env.example /caminho/private/.env
 chmod 600 /caminho/private/.env
 ```
 
-É preciso pelo menos um destino:
+A entrega prevista é o webhook do n8n (`https://n8n.emersol.ai`), configurado só no servidor:
 
-- `WEBHOOK_URL` em HTTPS (no teste local, `http://127.0.0.1` também vale). O cabeçalho `X-Webhook-Secret` sai se `WEBHOOK_SECRET` estiver preenchido. O n8n em `https://n8n.emersol.ai` entra aqui com o URL do webhook que você criar.
-- ou SMTP: `SMTP_HOST`, `SMTP_FROM` e `CONTACT_TO`. `SMTP_TLS` pode ser `starttls` (padrão), `ssl` ou `none`.
+- `WEBHOOK_URL`: URL HTTPS do webhook. No teste local, `http://127.0.0.1` também vale.
+- `WEBHOOK_SECRET`: opcional. Se estiver preenchido, `public/api/contact.php` envia esse valor no cabeçalho `X-Webhook-Secret`. Se estiver vazio, o cabeçalho não sai. O n8n deve recusar o pedido quando o cabeçalho não bater com o segredo combinado.
+
+SMTP continua disponível, sem ser obrigatório: `SMTP_HOST`, `SMTP_FROM` e `CONTACT_TO`. `SMTP_TLS` pode ser `starttls` (padrão), `ssl` ou `none`.
 
 Se os dois existirem, basta um aceitar a mensagem. Se nenhum existir, a resposta é erro `not_configured` e o texto deixa claro que nada foi enviado.
 
@@ -136,7 +138,7 @@ O português é o de partida, escrito para quem lê no Brasil e também em Portu
 
 ## O que é indispensável para colocar no ar
 
-1. E-mail público em `src/config/site.ts` (`email`).
-2. Identificação do responsável no mesmo arquivo: `legalName`, identificador fiscal (`taxId`) e endereço. A política de privacidade publica só o que estiver preenchido.
-3. Um destino real no `.env` fora do docroot: `WEBHOOK_URL` ou o trio `SMTP_HOST`, `SMTP_FROM` e `CONTACT_TO`.
-4. `dist/` no docroot do domínio, com PHP ativo para `/api/contact.php`.
+O e-mail público, a razão social, o CNPJ e o endereço já estão em `src/config/site.ts` e aparecem na política de privacidade nos quatro idiomas.
+
+1. `WEBHOOK_URL` do n8n no `.env` fora do docroot. `WEBHOOK_SECRET` é opcional; se existir, o PHP manda o cabeçalho `X-Webhook-Secret`.
+2. `dist/` no docroot do domínio, com PHP ativo para `/api/contact.php`.

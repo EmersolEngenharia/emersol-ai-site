@@ -1,6 +1,6 @@
 ---
 import Breadcrumbs from "../Breadcrumbs.astro";
-import { postalAddress, publicEmail, site } from "../../config/site";
+import { controllerName, postalAddress, publicEmail, site } from "../../config/site";
 import { crumbs } from "../../lib/crumbs";
 import { fill } from "../../i18n";
 import type { Dictionary } from "../../i18n/types";
@@ -16,7 +16,7 @@ const email = publicEmail();
 const address = postalAddress();
 const tax = [site.taxId.label.trim(), site.taxId.value.trim()].filter(Boolean).join(" ");
 const rows = [
-  { label: dict.privacy.fieldLabels.legalName, value: site.legalName.trim(), empty: dict.privacy.notPublished },
+  { label: dict.privacy.fieldLabels.legalName, value: controllerName(), empty: dict.privacy.notPublished },
   { label: dict.privacy.fieldLabels.email, value: email, empty: dict.privacy.notPublished },
   { label: dict.privacy.fieldLabels.address, value: address, empty: dict.privacy.notPublished },
   { label: dict.privacy.fieldLabels.taxId, value: tax, empty: dict.privacy.notPublished },

@@ -52,11 +52,15 @@ export function organizationNode(locale: Locale, dict: Dictionary) {
   if (address) {
     node.address = {
       "@type": "PostalAddress",
-      streetAddress: site.address.street.trim() || undefined,
+      streetAddress:
+        [site.address.street, site.address.district]
+          .map((part) => part.trim())
+          .filter(Boolean)
+          .join(", ") || undefined,
       addressLocality: site.address.city.trim() || undefined,
       addressRegion: site.address.region.trim() || undefined,
       postalCode: site.address.postalCode.trim() || undefined,
-      addressCountry: site.address.country.trim() || undefined,
+      addressCountry: site.address.country.trim() === "Brasil" ? "BR" : site.address.country.trim() || undefined,
     };
   }
 

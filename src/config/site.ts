@@ -23,11 +23,17 @@ export const site = {
   name: "Emersol.ai",
   url: "https://emersol.ai",
 
-  /** Razão social do responsável pelo tratamento. Vazio até ser informada. */
-  legalName: "",
+/**
+   * Razão social registrada, sem acento, como no CNPJ.
+   * Nas páginas aparece junto com legalNameDisplay.
+   */
+  legalName: "EMERSOL SERVICOS LTDA",
+
+  /** Nome do responsável como deve ser lido nas quatro línguas. */
+  legalNameDisplay: "Emersol Serviços Ltda",
 
   /** E-mail público de contato e de pedidos de privacidade. */
-  email: "",
+  email: "emerson@emersol.ai",
 
   /** Telefone público, com DDI. Exibido só se preenchido. */
   phone: "",
@@ -43,17 +49,18 @@ export const site = {
    * Todos os campos vazios = endereço não publicado.
    */
   address: {
-    street: "",
-    city: "",
-    region: "",
-    postalCode: "",
-    country: "",
+    street: "Rua José Martins Correia, 494, Sala 01",
+    district: "Bairro Paranaíba",
+    city: "Itumbiara",
+    region: "GO",
+    postalCode: "75526-300",
+    country: "Brasil",
   },
 
   /** Identificador fiscal. label ex.: "CNPJ" ou "NIF". value vazio = omitido. */
   taxId: {
-    label: "",
-    value: "",
+    label: "CNPJ",
+    value: "45.356.855/0001-98",
   },
 
   /** Contato de encarregado, se houver designação. Vazio = nada é publicado. */
@@ -134,17 +141,21 @@ export function whatsappHref(): string {
   return number ? `https://wa.me/${number}` : "";
 }
 
+export function controllerName(): string {
+  const display = site.legalNameDisplay.trim();
+  const legal = site.legalName.trim();
+  if (display && legal && display !== legal) return `${display} (${legal})`;
+  return display || legal;
+}
+
 export function postalAddress(): string {
-  const parts = [
-    site.address.street,
-    site.address.city,
-    site.address.region,
-    site.address.postalCode,
-    site.address.country,
-  ]
+  const street = [site.address.street, site.address.district]
     .map((part) => part.trim())
-    .filter(Boolean);
-  return parts.join(", ");
+    .filter(Boolean)
+    .join(", ");
+  const city = [site.address.city.trim(), site.address.region.trim()].filter(Boolean).join(" - ");
+  const postal = site.address.postalCode.trim() ? `CEP ${site.address.postalCode.trim()}` : "";
+  return [street, city, postal, site.address.country.trim()].filter(Boolean).join(", ");
 }
 
 export function sameAs(): string[] {

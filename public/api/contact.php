@@ -555,6 +555,7 @@ if ($webhook !== '') {
             throw new RuntimeException('webhook_scheme');
         }
         $headers = ['Content-Type: application/json', 'User-Agent: EmersolSite/1.0'];
+        // Segredo opcional. Vazio = o cabeçalho não é enviado.
         $secret = one_line($env['WEBHOOK_SECRET'] ?? '');
         if ($secret !== '') {
             $headers[] = 'X-Webhook-Secret: ' . $secret;
